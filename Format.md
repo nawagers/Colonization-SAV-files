@@ -64,7 +64,7 @@ The most mysterious section of data. It could be serialized map data if it’s j
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 3005 (0xBBD) bytes
 
-There are 8 base terrain types (Tundra, Prairie, Grassland, Plains, Swamp, Desert, Savannah, Marsh) plus 3 special types (Artic, Ocean, Sea Lane). Each of the base types can have forests, mountains, hills, minor rivers, and major rivers. The arctic functions like a base type except it does not allow forests. Some of these options can be in combination. Forests can be with minor rivers or major rivers, but not both at once. Hills can be with minor rivers. Oceans and sea lanes can have minor or major rivers, but not both at once.
+There are 8 base terrain types (Tundra, Prairie, Grassland, Plains, Swamp, Desert, Savannah, Marsh) plus 3 special types (Arctic, Ocean, Sea Lane). Each of the base types can have forests, mountains, hills, minor rivers, and major rivers. The arctic functions like a base type except it does not allow forests. Some of these options can be in combination. Forests can be with minor rivers or major rivers, but not both at once. Hills can be with minor rivers. Oceans and sea lanes can have minor or major rivers, but not both at once.
 
 
 ## Unknown Map C
