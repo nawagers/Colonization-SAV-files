@@ -1,7 +1,17 @@
+"""
+Written by nwagers, 2020
+
+Intended to be shared by all who are curious.
+Released to the public domain and completely
+unrestricted, but attribution appreciated.
+
+"""
+
+
 import string
 
 
-path = 'C:\GOG Games\Colonization\MPS\COLONIZE\COLONY{}.SAV'
+path = 'C:\\GOG Games\\Colonization\\MPS\\COLONIZE\\COLONY{}.SAV'
 slot = '00'
 path = path.format(slot)
 display = [0, 1, 2, 3]  # maps to print and their order [0, 1, 2, 3]

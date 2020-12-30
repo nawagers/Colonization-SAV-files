@@ -1,3 +1,13 @@
+"""
+Written by nwagers, 2020
+
+Intended to be shared by all who are curious.
+Released to the public domain and completely
+unrestricted, but attribution appreciated.
+
+"""
+
+
 path = 'C:\\GOG Games\\Colonization\\MPS\COLONIZE\\COLONY{}.SAV'
 
 path1 = path.format('00')
