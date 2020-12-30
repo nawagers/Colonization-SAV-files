@@ -4,7 +4,10 @@ SAV file reader, editor, and tools
 The goal of this project is to describe as much of the format of the save game files for Colonization 3.0 as possible and to build
 a Python module that can read, modify, and rebuild valid SAV files.
 
-Included are some helper files. The scripts are written for Python 3.6 and should be cross platform
+Included are some helper files. The scripts are written for Python 3.6 and should be cross platform. It may be helpful
+to note that Colonization has two autosave slots. File COLONY09.SAV is saved at the end of every turn (when the year changes).
+File COLONY08.SAV is saved at the end of each decade in the game. These are available in the load screen, but not the save
+screen.
 
 ## ALLTERRA.MP
 A map file built with the map editor that features all the different terrain types as islands in the north of the map. The south
@@ -32,7 +35,7 @@ Example: You want to see how "load food" is stored in a trade route:
 4. Edit the trade route to change the load food to load muskets.
 5. You should be back on the blinking unit waiting for orders
 6. Save the game in the second slot (for file 01).
-7. Run hex_compare.py on files 01 and 02.
+7. Run hex_compare.py on files 00 and 01.
 8. Note their absolute bytes and offset within the address range.
 9. Look at the data in a hex editor like https://hexed.it/
 
