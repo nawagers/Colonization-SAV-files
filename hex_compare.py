@@ -32,59 +32,60 @@ for data in [data1, data2]:
     map_width = int.from_bytes(data[0x0C:0x0E], 'little')
     map_height = int.from_bytes(data[0x0E:0x10], 'little')
     
-    field = [('Header', 0),
-             ('Colonies', 0x186),
-             ('Units', 0x186 + 202*num_col),
-             ('Powers', 0x186 + 202*num_col + 28*num_unit),
-             ('Villages', 0x676 + 202*num_col + 28*num_unit),
-             ('Unknown B', 0x676 + 202*num_col + 28*num_unit + 18*num_vill),
-             ('Terrain Map', 0xBBD + 202*num_col + 28*num_unit + 18*num_vill),
+    field = [('Header', 0, 1),
+             ('Colonies', 0x186, 202),
+             ('Units', 0x186 + 202*num_col, 28),
+             ('Powers', 0x186 + 202*num_col + 28*num_unit, 316),
+             ('Villages', 0x676 + 202*num_col + 28*num_unit, 18),
+             ('Unknown B', 0x676 + 202*num_col + 28*num_unit + 18*num_vill, 1),
+             ('Terrain Map', 0xBBD + 202*num_col + 28*num_unit + 18*num_vill, 1),
              ('Unknown Map C', 0xBBD + 202*num_col + 28*num_unit +
-              18*num_vill + map_width*map_height),
+              18*num_vill + map_width*map_height, 1),
              ('Vis Map', 0xBBD + 202*num_col + 28*num_unit +
-              18*num_vill + 2*map_width*map_height),
+              18*num_vill + 2*map_width*map_height, 1),
              ('Unknown Map D', 0xBBD + 202*num_col + 28*num_unit +
-              18*num_vill + 3*map_width*map_height),
+              18*num_vill + 3*map_width*map_height, 1),
              ('Unknown E', 0xBBD + 202*num_col + 28*num_unit +
-              18*num_vill + 4*map_width*map_height),
+              18*num_vill + 4*map_width*map_height, 1),
              ('Unknown F', 0xDB5 + 202*num_col + 28*num_unit +
-              18*num_vill + 4*map_width*map_height),
+              18*num_vill + 4*map_width*map_height, 1),
              ('Trade Routes', 0xE23 + 202*num_col + 28*num_unit +
-              18*num_vill + 4*map_width*map_height)]
+              18*num_vill + 4*map_width*map_height, 74)]
     fields.append(field)
 
 print('Start Address')
-for name, address in fields[0]:
+for name, address, _ in fields[0]:
     print(f'  {name:13} 0x{address:04X}')
 print()
-if data1[0x2E] != data2[0x2E]:
+
+# Variable size fields
+sizes = [(0x2E, 1, 'colony', 'colonies'),
+         (0x2C, 2, 'unit', 'units'),
+         (0x2A, 4, 'village', 'villages')]
+
+
+for address, field, single, plural in sizes:
     
-    print('***** ERROR: Different colony count *****')
-    print(f'File 1 has {data1[0x2E]} colonies and file 2 has {data2[0x2E]}')
-    print('Dropping colonies from comparison')
-    print()
-    cutsize = fields[0][2][1] - fields[0][1][1]
-    data1 = data1[:fields[0][1][1]] + b'\x00' * cutsize + data1[fields[0][2][1]:]
-    data2 = data2[:fields[1][1][1]] + b'\x00' * cutsize + data2[fields[1][2][1]:]
+    if data1[address] != data2[address]:
+        print(f'***** ERROR: Different {single} count *****')
+        print(f'File 1 has {data1[address]} {plural} and ', end = '')
+        print(f'file 2 has {data2[address]}')
+        print(f'Dropping {plural} from comparison')
+        print()
+        
+        cutsize = fields[0][field + 1][1] - fields[0][field][1]
+        removed = fields[1][field + 1][1] - fields[0][field + 1][1]
 
+        # Realign data in data2, blank out section in both
+        data1 = (data1[:fields[0][field][1]] + b'\x00' * cutsize +
+                 data1[fields[0][field + 1][1]:])
+        data2 = (data2[:fields[1][field][1]] + b'\x00' * cutsize +
+                 data2[fields[1][field + 1][1]:])
 
-if data1[0x2C] != data2[0x2C]:
-    print('***** ERROR: Different unit count *****')
-    print(f'File 1 has {data1[0x2C]} units and file 2 has {data2[0x2C]}')
-    print('Dropping units from comparison')
-    print()
-    cutsize = fields[0][3][1] - fields[0][2][1]
-    data1 = data1[:fields[0][2][1]] + b'\x00' * cutsize + data1[fields[0][3][1]:]
-    data2 = data2[:fields[1][2][1]] + b'\x00' * cutsize + data2[fields[1][3][1]:]
-
-if data1[0x2A] != data2[0x2A]:
-    print('***** ERROR: Different village count *****')
-    print(f'File 1 has {data1[0x2A]} villages and file 2 has {data2[0x2A]}')
-    print('Dropping villages from comparison')
-    print()
-    cutsize = fields[0][5][1] - fields[0][4][1]
-    data1 = data1[:fields[0][4][1]] + b'\x00' * cutsize + data1[fields[0][5][1]:]
-    data2 = data2[:fields[1][4][1]] + b'\x00' * cutsize + data2[fields[1][5][1]:]
+        # Realign addresses for data2
+        fields[1] = (fields[1][:field + 1] +
+                     [(label, address - removed, group)
+                      for label, address, group in fields[1][field + 1:]])
 
 
 if any(data1[loc] != data2[loc] for loc in [0x0C, 0x0D, 0x0E, 0x0F]):
@@ -99,8 +100,18 @@ if len(data1) != len(data2):
 for address, vals in enumerate(zip(data1, data2)):
     if vals[0] != vals[1]:
         label = ''
-        for field_name, start in fields[0]:
+        for field_name, start, length in fields[0]:
             if address >= start:
                 label = field_name
                 offset = address - start
-        print(f'Change at 0x{address:04X}: 0x{vals[0]:02X} -> 0x{vals[1]:02X}  {label} (0x{offset:04X})')
+                group = length
+
+        print(f'Change at 0x{address:04X}: 0x{vals[0]:02X} -> '\
+              f'0x{vals[1]:02X}  {label} (0x{offset:04X}', end = '')
+        if group > 1:
+            print(f', Group {offset // group} Byte {offset % group}', end = '')
+
+        elif 'Map' in label:
+            print(f' Position ({offset % map_width}),({offset // map_width})', end = '')
+        print(')')
+                  
