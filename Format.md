@@ -75,6 +75,8 @@ There are 8 base terrain types (Tundra, Prairie, Grassland, Plains, Swamp, Deser
 
 This map may be some sort of pathing aid. In the ocean it does a line fill from the left hand side until it hits land or column 41. This may be “Pacific Ocean”. At first glance, roads and colonies seem to affect it and it marks some obstructions like native villages and at least some units on the map. Needs more investigation.
 
+Setting the third least significant bit (ie OR 0000 0100) depletes a resource. Normally this is 0 for all prime and non-prime tiles, but when a prime resource is depleted, like a silver mine being depleted, the flag gets set to suppress the resource.
+
 
 ## Vis Map
 **Length:** (x+2)*(y+2) bytes = 4176 (0x1050) standard size
