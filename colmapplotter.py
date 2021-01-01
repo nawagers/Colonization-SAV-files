@@ -23,14 +23,16 @@ with open(path, "rb") as binary_file:
 num_colonies = data[0x2e]
 num_units = data[0x2c]
 num_villages = data[0x2a]
-mapsize = (70+2)*(56+2)
+map_width = data[0x0C]
+map_height = data[0x0E]
+
 
 
 maps = []    
 for offset in display:
     address = 0xBBD + num_colonies * 202 + num_units * 28
-    address += num_villages * 18 + offset * mapsize
-    subset = data[address:address+mapsize]
+    address += num_villages * 18 + offset * map_width * map_height
+    subset = data[address:address + map_width*map_height]
     maps.append((subset, {}))
 
 
@@ -137,8 +139,8 @@ if 0 in display:
 for subset, table in maps:
     print('0    0    1    1    2    2    3    3    4    4    5    5')
     print('0    5    0    5    0    5    0    5    0    5    0    5')
-    for row, start in enumerate(range(0, 4176, 58)):
-        line = (''.join([table[x] for x in subset[start:start + 58]]))
+    for row, start in enumerate(range(0, map_width * map_height, map_width)):
+        line = (''.join([table[x] for x in subset[start:start + map_width]]))
         if row % 5 == 0:
             line += f' {row}'
         print(line)
