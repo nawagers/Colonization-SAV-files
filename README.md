@@ -77,4 +77,16 @@ where it starts, and the section's length. Important bytes are noted. A more det
 the current version is here: https://docs.google.com/spreadsheets/d/1_IOGjJbMT43z2Tcr-Rhdwkg65iBaAV7Lo3XRl-08hII/edit?usp=sharing
 
 ## Future
-A python module that fully reads the data and puts it in standard Python structures is partially made, but too sloppy to post yet.
+A python module that fully reads the data and puts it in standard Python structures is partially made. It shouldn't be considered a library with a fixed interface at this point. Right now you have to manually feed the byte ranges to the appropriate structures. Here is what colonies look like:
+
+        first_col = 0x186
+        col_offsets = [first_col + colony.byte_length * x for x in range(num_colonies)]
+
+        colonies = []
+        for offset in col_offsets:
+            mycol = colony()
+            mycol.unpack(data[offset:offset + colony.byte_length])
+            colonies.append(mycol)
+
+
+The data should be opened from a file and read in as binary in mode "rb"
