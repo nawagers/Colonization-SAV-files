@@ -3,7 +3,7 @@
 ## Notes:
 Most Strings are stored as 24 byte null terminated ascii, giving up to 23 characters printed. Data between the null terminator and the end of the buffer is ignored. Multi-byte integers are stored in little endian, meaning adding 1 to a register that holds FF 00 would give 00 01. There is at least a 3 byte register for gold, though it’s probably a 4 byte register. So far, no evidence of registers larger than that.
 
-Map data is stored for a (x+2) * (y+2) tile map. A 1 tile buffer is applied on all sides in the game. It’s unclear if these values are represented in the header by bytes 12 (0xC) and 14 (0xE) and possibly as 2 byte values that include 13 (0xD) and 15 (0xF). Some text in files included with the game suggest variable map sizes, but it seems like the map editor does not support that feature. It could be that the game partially supports it, but doesn’t have proper bounds checking and hard-coded map size assumptions. Example: going to/from and being in Europe are represented by map positions (2xx, 2xx). Maps bigger than this size would probably have pathing problems, and no units or colonies could exist at a position with more than one byte. Position data is from the top left corner. The 0 row and 0 column are not displayed along with the highest row and column. Positions are all stored as (column, row) with (1, 1) being the top left visible tile.
+Map data is stored for a (x+2) * (y+2) tile map. A 1 tile buffer is applied on all sides in the game. The map size is in bytes 12 (0xC) and 14 (0xE). It’s unclear if these values are 2 byte values that include 13 (0xD) and 15 (0xF). The map editor does not support non-standard map size (58x72). The game partially supports it, but doesn’t have proper bounds checking and has some hard-coded map size assumptions. Example: going to/from and being in Europe are represented by map positions (2xx, 2xx). Maps bigger than this size would probably have pathing problems, and no units or colonies could exist at a position with more than one byte. Position data is from the top left corner. The 0 row and 0 column are not displayed along with the highest row and column. Positions are all stored as (column, row) with (1, 1) being the top left visible tile.
 
 Unknown sections or the header probably contains European prices and units, crosses needed for the next unit and/or total crosses, next three units available,, taxes, embargoes, royal forces, independence status, withdrawn status, war status between powers.
 
@@ -64,21 +64,34 @@ The most mysterious section of data. It could be serialized map data if it’s j
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 3005 (0xBBD) bytes
 
-There are 8 base terrain types (Tundra, Prairie, Grassland, Plains, Swamp, Desert, Savannah, Marsh) plus 3 special types (Arctic, Ocean, Sea Lane). Each of the base types can have forests, mountains, hills, minor rivers, and major rivers. The arctic functions like a base type except it does not allow forests. Some of these options can be in combination. Forests can be with minor rivers or major rivers, but not both at once. Hills can be with minor rivers. Oceans and sea lanes can have minor or major rivers, but not both at once.
+There are 8 base terrain types (Tundra, Prairie, Grassland, Plains, Swamp, Desert, Savannah, Marsh) plus 3 special types (Arctic, Ocean, Sea Lane). Each of the base types can have forests, mountains, hills, minor rivers, and major rivers. The arctic functions like a base type except it does not allow forests. Some of these options can be in combination. 
 
 The north and south buffers are arctic and it's possible to see an edge of it. The east and west buffers are sea lane tiles.
 
-|Base|Forest|
+|Bit(s)|Function|
 |---|---|
-|Tundra|Boreal Forest|
-|Prairie|Broadleaf Forest|
-|Grassland|Conifer Forest|
-|Plains|Mixed Forest|
-|Swamp|Rain Forest|
-|Desert|Scrub Forest|
-|Savannah|Tropical Forest|
-|Marsh|Wetland Forest|
-|Arctic||
+|1-3|Base|
+|4|Forest|
+|5|Special|
+|6|Hills|
+|7|River|
+|8|Prominent|
+
+For special types, both the Special and Forest bits are set. The Prominent bit converts Hills to Mountains and Minor River to Major River. The Prominent bit can not be used with both Hills and River or Hills and Forest (no Mountain Rivers or Mountain Forests) except for Arctic Mountains, where both the Special and Forest bits are set along with Hills and Prominent.
+
+|Bits|Base|Forest|
+|---|---|---|
+|000|Tundra|Boreal Forest|
+|001|Prairie|Broadleaf Forest|
+|010|Grassland|Conifer Forest|
+|011|Plains|Mixed Forest|
+|100|Swamp|Rain Forest|
+|101|Desert|Scrub Forest|
+|110|Savannah|Tropical Forest|
+|111|Marsh|Wetland Forest|
+|000|Arctic||
+|001|Ocean||
+|010|Sea Lane||
 
 
 ## Mask Map
