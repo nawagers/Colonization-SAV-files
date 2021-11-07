@@ -39,9 +39,11 @@ Movable units that are not in colonies. Includes ships, wagon trains, colonists,
 
 Each power has an even 316 (0x13C) bytes. Data order is English, French, Spanish, Dutch.
 
-Gold is at least 3 bytes at 0x2A (+ 0x13C * power offset). Max money is unknown. Up to 983039 (0x0EFFFF) works. 
+Gold is 4 bytes at 0x2A (+ 0x13C * power offset). Using all 4 bytes causes the tax rate to go off screen. 
 
-Other values in this block are unexplored. Probably the sections with taxes, embargoes, European prices, and Royal Forces.
+Market sensitivity data starts at 0x4C (+ 0x13C * power offset). Each supply is first represented by 1 byte, after that block of 16 bytes, each supply has 2 bytes, and then 4 bytes and 4 bytes and 4 bytes to the end of the section. The market data block is (1+2+4+4+4) * 16 = 240 (0xF0) bytes. The first byte increments when prices raise (from buying in Europe) and decrements when prices fall (from selling in Europe). It's not yet clear what happens when it goes below 0 or how custom house sales work. The second group (2 byte array) affects all 4 powers.
+
+Taxes, embargoes, next units, and founding fathers are all found here.
 
 ## Indian Villages
 **Length:** 18 (0x12) bytes * number of villages
