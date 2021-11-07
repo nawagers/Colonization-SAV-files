@@ -132,19 +132,16 @@ Prime resources follow a set pattern as seen here (https://forums.civfanatics.co
 This is some sort of “last traveled” map, which seems to be among all units. Each power (including tribes) has a code it sets. Land and sea have different values. . The values are overwritten instead of generating a new value that indicates multiple powers have visited the square. This is somehow related to the display mask. It may be a fog of war map. Values are not turn based, as in they don’t decay back to some state. Definitely contains some portion of Lost City Rumors, but doesn't fully describe them.
 
 
-## Visibility Map
+## Visibility and Score Map
 **Length:** (x+2)*(y+2) bytes = 4176 (0x1050) standard size
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 3 * (map width + 2) * (map height + 2) + 3005 (0xBBD) bytes
 
-The highest bits of this map are visibility flags for each of the powers. If the bit is 0, then the power can't see that tile. If the bit is 1, then it is visible. The lower nibble, bits 1-4, are all used, but seem static once the game begins and also seem restricted to land. More exploring needs done.
+The highest bits of this map are visibility flags for each of the powers. If the bit is 0, then the power can't see that tile. If the bit is 1, then it is visible. The lower nibble, bits 1-4, are the base colony site scores. These are used by the computer players to choose a place to build a colony. Higher scores are better. A 0 score is given to places that can't build (mountains, oceans). Coastal sites usually max out unless there is too much water. Scores are also adjusted at runtime as can be seen from the cheat menu.
 
-|Bit|Function|
+|Bit(s)|Function|
 |---|---|
-|1||
-|2||
-|3||
-|4||
+|1-4|Colony Score|
 |5|English|
 |6|French|
 |7|Spanish|
