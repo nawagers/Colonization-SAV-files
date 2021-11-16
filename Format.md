@@ -52,13 +52,19 @@ Taxes, embargoes, next units, and founding fathers are all found here.
 
 Includes position, tribe, alarm status (per power), missionary status, last goods bought, last goods sold, attack counter (per power), whether they've taught you, and if it's a capital. Does not contain what they will teach you, what they will buy, or what they will sell.
 
-
-## Unknown B
-**Length:** 1351 (0x547) bytes (seems static)
+## Tribes
+**Length:** 78 (0x4E) bytes * number of tribes (8) = 624 (0x270)
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 1654 (0x676) bytes
 
-The most mysterious section of data. It could be serialized map data if it’s just 1 bit per tile, but that seems unlikely. I suspect one thing it contains is the prime resources. May also contain locations of Lost City Rumors.
+Includes alarm towards European powers, supply counts, horses/muskets, and more.
+
+## Unknown B
+**Length:** 727 (0x2D7) bytes (seems static)
+
+**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 2278 (0x8E6) bytes
+
+Not really sure what is in here.
 
 
 ## Terrain Map
