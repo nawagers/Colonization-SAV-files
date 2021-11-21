@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Written by nwagers, 2020
 
@@ -7,18 +9,40 @@ unrestricted, but attribution appreciated.
 
 """
 
-
 import string
+import sys
+import os.path
 
+if len(sys.argv) >3:
+    print("syntax: %d <save game> <slot>")
+    sys.exit(0)
 
-path = 'C:\\GOG Games\\Colonization\\MPS\\COLONIZE\\COLONY{}.SAV'
-slot = '00'
-path = path.format(slot)
 display = [0, 1, 2, 3]  # maps to print and their order [0, 1, 2, 3]
 
+if len(sys.argv) == 3:
+    try:
+        display = [int(sys.argv[2])]
+        if display[0] <0 or display[0] > 3:
+            print("slot must be a value between 0 and 3")
+            sys.exit(1)
+
+    except ValueError:
+        print("slot must be a value between 0 and 3")
+        sys.exit(1)
+
+if len(sys.argv) == 1:
+    path = 'C:\\GOG Games\\Colonization\\MPS\\COLONIZE\\COLONY{}.SAV'
+    slot = '00'
+    path = path.format(slot)
+else:
+    if not os.path.exists(sys.argv[1]):
+        print("Save game not found")
+        sys.exit(1)
+    path = sys.argv[1]
+
 with open(path, "rb") as binary_file:
-        # Read the whole file at once
-        data = binary_file.read()
+    # Read the whole file at once
+    data = binary_file.read()
 
 num_colonies = data[0x2e]
 num_units = data[0x2c]
@@ -26,9 +50,7 @@ num_villages = data[0x2a]
 map_width = data[0x0C]
 map_height = data[0x0E]
 
-
-
-maps = []    
+maps = []
 for offset in display:
     address = 0xBBD + num_colonies * 202 + num_units * 28
     address += num_villages * 18 + offset * map_width * map_height
@@ -43,17 +65,10 @@ for subset, table in maps:
         if tile not in table:
             table[tile] = chars[len(table)]
 
-
-
-
-
-
 # Static tables and modifications
 # Useful for comparing changes between saves
 # Allows for remapping ocean to ' ' or similar
 # Copy dynamic table from first run and add in a static map
-
-
 
 terrain = {'Tundra': 0, 'Tundra Hills': 32, 'Tundra Mountains': 160,
            'Tundra Minor River': 64, 'Tundra Major River': 192,
@@ -102,12 +117,12 @@ terrain = {'Tundra': 0, 'Tundra Hills': 32, 'Tundra Mountains': 160,
 
 if 0 in display:
     i = display.index(0)
-    
+
 ##    # Converts identified terrain to -
-##    for key, val in terrain.items(): 
+##    for key, val in terrain.items():
 ##        if val in maps[i][1] and val != 26:
 ##            maps[i][1][val] = '-'
-            
+
     # Ocean, Ocean Minor River, and Ocean Major River to <space>
     maps[i][1][25] = ' '
     maps[i][1][89] = ' '
@@ -130,10 +145,7 @@ if 0 in display:
 ##             59: '5', 56: '6', 21: '7', 58: '8', 60: '9', 57: '~',
 ##             61: '!', 63: '@', 62: '#', 42: '$', 43: '%', 47: '^',
 ##             32: '&'}
-##    maps[i] = ((maps[i][0], table)) 
-
-
-
+##    maps[i] = ((maps[i][0], table))
 
 # Outputs
 for subset, table in maps:
@@ -150,7 +162,3 @@ for subset, table in maps:
     print(table)
     print()
     print()
-
-
-
-
