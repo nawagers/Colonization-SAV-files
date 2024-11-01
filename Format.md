@@ -59,12 +59,12 @@ Includes position, tribe, alarm status (per power), missionary status, last good
 
 Includes alarm towards European powers, supply counts, horses/muskets, and more.
 
-## Unknown B
+## Reports
 **Length:** 727 (0x2D7) bytes (seems static)
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 2278 (0x8E6) bytes
 
-Not really sure what is in here.
+Precomputed data to display for reports.
 
 
 ## Terrain Map
@@ -90,13 +90,13 @@ For special types, both the Special and Forest bits are set. The Prominent bit c
 |Bits|Base|Forest|
 |---|---|---|
 |000|Tundra|Boreal Forest|
-|001|Prairie|Broadleaf Forest|
-|010|Grassland|Conifer Forest|
-|011|Plains|Mixed Forest|
-|100|Swamp|Rain Forest|
-|101|Desert|Scrub Forest|
-|110|Savannah|Tropical Forest|
-|111|Marsh|Wetland Forest|
+|001|Desert|Scrub Forest|
+|010|Plains|Mixed Forest|
+|011|Prairie|Broadleaf Forest|
+|100|Grassland|Conifer Forest|
+|101|Savannah|Tropical Forest|
+|110|Marsh|Wetland Forest|
+|111|Swamp|Rain Forest|
 |000|Arctic||
 |001|Ocean||
 |010|Sea Lane||
@@ -176,23 +176,30 @@ The highest bits of this map are visibility flags for each of the powers. If the
 |7|Spanish|
 |8|Dutch|
 
-## Unknown E
-**Length:** 18 (0x12) * number of ? 
+## Sea Route Map
+**Length:** ⌈(map width+2)/4⌉*⌈(map height+2)/4⌉ bytes = 270 (0x10E) standard size
 
 **Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + 3005 (0xBBD) bytes
 
-Some sort of repeating structure data like units, colonies and villages. There appears to always be 28 of them. There doesn't seem to be a position on the map associated with them.
+Precomputed routing map of navigable ocean tiles. The terrain map is chunked into 4x4 groups. An anchor is chosen from the center 4 tiles that is water and path region 1. The anchor is prioritized as top left, bottom left, top right, bottom right of the center 4 tiles. If none of the 4 tiles are water region 1, or don't exist, the chunk is disconnected from everything. Each chunk is 1 byte, with the LSB representing a connection to the neighbor to the north. The bits go clockwise: N, NE, E, SE, S, SW, W, NW, and are symmetric to the other connected chunk. For example, if a chunk is connected with E, then the chunk to it's east is also connected with W. Chunks are connected if the shortest distance between the anchor tiles is no more than 6. Data is stored transposed from the big maps (Terrain, Mask, etc), so all the bytes for a column are together [row, col] would be [0, 0], [1, 0], [2, 0] ... [0, 1], [1, 1], [2, 1] ...
+
+## Land Route Map
+**Length:** ⌈(x+2)/4⌉\*⌈(y+2)/4⌉ bytes = 270 (0x10E) standard size
+
+**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + ⌈(map width+2)/4⌉*⌈(map height+2)/4⌉ + 3005 (0xBBD) bytes
+
+Same as the Sea Route Map except using land tiles (any regions except 0)
 
 ## Unknown F
-**Length:** 110 (0x6E) bytes
+**Length:** 74 (0x4A) bytes
 
-**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + 3509 (0xDB5) bytes
+**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + 2 \* ⌈(map width+2)/4⌉*⌈(map height+2)/4⌉ + 3005 (0xBBD) bytes
 
-No idea what is here. The data has several 0x1600 and 0x1900 or 0x0016 and 0x0019 sets of bytes.
+Mostly unknown. The prime resources/lcr offsets are at 0x47
 
 ## Trade Routes
 **Length:** 888 (0x378) bytes
 
-**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + 3619 (0xE23) bytes
+**Start byte:** 202 (0xCA) bytes * number of colonies + 28 (0x1C) bytes * number of units + 18 (0x12) * number of villages + 4 * (map width + 2) * (map height + 2) + 2 \* ⌈(map width+2)/4⌉*⌈(map height+2)/4⌉ + 3079 (0xC07) bytes
 
 12 routes. Each route is 74 bytes (0x4A) in length and starts with a 32 (0x20) byte null terminated string. This should cover colonies on the way, load/unloads, and land/sea flags. Haven't broken this down to specific values.
